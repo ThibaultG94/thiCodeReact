@@ -7,7 +7,7 @@ import Layout from "./components/layout/Layout";
 // import Chat from "./pages/Chat";
 // import Login from "./pages/Login";
 // import Register from "./pages/Register";
-// import Settings from "./pages/Settings";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 function App() {
@@ -27,7 +27,7 @@ function App() {
                 {/* <Route path="chat" element={<Chat />} /> */}
                 {/* <Route path="chat/:conversationId" element={<Chat />} /> */}
                 {/* <Route path="chat/new" element={<Chat />} /> */}
-                {/* <Route path="settings" element={<Settings />} /> */}
+                <Route path="settings" element={<Settings />} />
               </Route>
 
               {/* 404 and redirects */}
