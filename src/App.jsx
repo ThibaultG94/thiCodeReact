@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
-// import ProtectedRoute from "./components/auth/ProtectedRoute";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Layout from "./components/layout/Layout";
 // import Home from "./pages/Home";
 // import Chat from "./pages/Chat";
@@ -23,12 +23,12 @@ function App() {
               {/* <Route path="register" element={<Register />} /> */}
 
               {/* Protected routes */}
-              {/* <Route element={<ProtectedRoute />}> */}
-              {/* <Route path="chat" element={<Chat />} /> */}
-              {/* <Route path="chat/:conversationId" element={<Chat />} /> */}
-              {/* <Route path="chat/new" element={<Chat />} /> */}
-              {/* <Route path="settings" element={<Settings />} /> */}
-              {/* </Route> */}
+              <Route element={<ProtectedRoute />}>
+                {/* <Route path="chat" element={<Chat />} /> */}
+                {/* <Route path="chat/:conversationId" element={<Chat />} /> */}
+                {/* <Route path="chat/new" element={<Chat />} /> */}
+                {/* <Route path="settings" element={<Settings />} /> */}
+              </Route>
 
               {/* 404 and redirects */}
               <Route path="404" element={<NotFound />} />
