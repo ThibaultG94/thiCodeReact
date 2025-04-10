@@ -3,7 +3,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Layout from "./components/layout/Layout";
-// import Home from "./pages/Home";
+import Home from "./pages/Home";
 // import Chat from "./pages/Chat";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -18,7 +18,7 @@ function App() {
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Layout />}>
-              {/* <Route index element={<Home />} /> */}
+              <Route index element={<Home />} />
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Register />} />
 
