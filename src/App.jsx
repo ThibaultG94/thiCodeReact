@@ -8,8 +8,7 @@ import Layout from "./components/layout/Layout";
 // import Login from "./pages/Login";
 // import Register from "./pages/Register";
 // import Settings from "./pages/Settings";
-// import NotFound from "./pages/NotFound";
-import { useState } from "react";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -17,7 +16,24 @@ function App() {
       <ThemeProvider>
         <Router>
           <Routes>
-            <Route path="/" element={<Layout />} />
+            {/* Public routes */}
+            <Route path="/" element={<Layout />}>
+              {/* <Route index element={<Home />} /> */}
+              {/* <Route path="login" element={<Login />} /> */}
+              {/* <Route path="register" element={<Register />} /> */}
+
+              {/* Protected routes */}
+              {/* <Route element={<ProtectedRoute />}> */}
+              {/* <Route path="chat" element={<Chat />} /> */}
+              {/* <Route path="chat/:conversationId" element={<Chat />} /> */}
+              {/* <Route path="chat/new" element={<Chat />} /> */}
+              {/* <Route path="settings" element={<Settings />} /> */}
+              {/* </Route> */}
+
+              {/* 404 and redirects */}
+              <Route path="404" element={<NotFound />} />
+              <Route path="*" element={<Navigate to="/404" replace />} />
+            </Route>
           </Routes>
         </Router>
       </ThemeProvider>
