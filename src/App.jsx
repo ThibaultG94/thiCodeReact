@@ -4,7 +4,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Layout from "./components/layout/Layout";
 import Home from "./pages/Home";
-// import Chat from "./pages/Chat";
+import Chat from "./pages/Chat";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Settings from "./pages/Settings";
@@ -24,9 +24,9 @@ function App() {
 
               {/* Protected routes */}
               <Route element={<ProtectedRoute />}>
-                {/* <Route path="chat" element={<Chat />} /> */}
-                {/* <Route path="chat/:conversationId" element={<Chat />} /> */}
-                {/* <Route path="chat/new" element={<Chat />} /> */}
+                <Route path="chat" element={<Chat />} />
+                <Route path="chat/:conversationId" element={<Chat />} />
+                <Route path="chat/new" element={<Chat />} />
                 <Route path="settings" element={<Settings />} />
               </Route>
 
