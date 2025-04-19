@@ -34,7 +34,8 @@ const Register = () => {
     }
 
     // Validate password (at least 8 characters with letters and numbers)
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    const passwordRegex =
+      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
     if (!passwordRegex.test(password)) {
       setError(
         "Le mot de passe doit contenir au moins 8 caractères, une lettre et un chiffre"
@@ -73,10 +74,23 @@ const Register = () => {
           navigate("/login");
         }, 2000);
       } else {
-        setError(
-          result.error ||
-            "Une erreur est survenue lors de l'inscription. Veuillez réessayer."
-        );
+        // If result.error is an error object (from Django), we display them properly
+        if (typeof result.error === "object") {
+          // Extract the first error message for each field
+          const errorMessages = Object.entries(result.error)
+            .map(
+              ([field, errors]) =>
+                `${field}: ${Array.isArray(errors) ? errors[0] : errors}`
+            )
+            .join("\n");
+
+          setError(errorMessages);
+        } else {
+          setError(
+            result.error ||
+              "Une erreur est survenue lors de l'inscription. Veuillez réessayer."
+          );
+        }
       }
     } catch (err) {
       setError("Une erreur est survenue. Veuillez réessayer plus tard.");
@@ -109,7 +123,7 @@ const Register = () => {
           {error && (
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-md flex items-start">
               <FiAlertCircle className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
-              <span>{error}</span>
+              <div className="whitespace-pre-line">{error}</div>
             </div>
           )}
 

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
+import { userApi, getCsrfToken } from "../lib/api";
 
 const AuthContext = createContext(null);
 
@@ -7,18 +7,19 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Check if the user is already connected to the load
+  // Check if the user is already connected on load
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get("/api/accounts/current-user/", {
-          withCredentials: true, // Important pour les cookies CSRF
-        });
-        if (response.data.user) {
-          setUser(response.data.user);
+        // We first retrieve a CSRF token
+        await getCsrfToken();
+
+        const response = await userApi.getCurrentUser();
+        if (response.data) {
+          setUser(response.data);
         }
       } catch (error) {
-        console.log("User not authenticated");
+        console.log("User not authenticated or API error:", error);
       } finally {
         setLoading(false);
       }
@@ -30,57 +31,55 @@ export const AuthProvider = ({ children }) => {
   const login = async (username, password) => {
     setLoading(true);
     try {
-      // Get the CSRF token first
-      await axios.get("/api/csrf/");
+      const response = await userApi.login(username, password);
 
-      const response = await axios.post(
-        "/api/accounts/login/",
-        {
-          username,
-          password,
-        },
-        {
-          withCredentials: true,
-        }
-      );
+      // Update user and return success
+      if (response.data && response.data.user) {
+        setUser(response.data.user);
+        return { success: true };
+      }
 
-      setUser(response.data.user);
-      return { success: true };
+      // If we arrive here, the request was successful but without user data.
+      return { success: false, error: "Format de réponse invalide" };
     } catch (error) {
+      // IMPORTANT: Check whether the user is still logged in despite the error.
+      try {
+        const userCheck = await userApi.getCurrentUser();
+        if (userCheck.data) {
+          setUser(userCheck.data);
+          return { success: true };
+        }
+      } catch (e) {
+        // Ignore this verification error
+      }
+
       return {
         success: false,
-        error:
-          error.response?.data?.message ||
-          "Une erreur est survenue lors de la connexion",
+        error: error.response?.data?.message || "Erreur de connexion",
       };
     } finally {
       setLoading(false);
     }
   };
-
   const register = async (username, email, password, password2) => {
     setLoading(true);
     try {
-      await axios.get("/api/csrf/");
-
-      const response = await axios.post(
-        "/api/accounts/register/",
-        {
-          username,
-          email,
-          password1: password,
-          password2,
-        },
-        {
-          withCredentials: true,
-        }
+      const response = await userApi.register(
+        username,
+        email,
+        password,
+        password2
       );
 
+      // Do not automatically log users in after registration
+      // The user must log in after registration
       return { success: true };
     } catch (error) {
+      console.error("Register error:", error);
       return {
         success: false,
         error:
+          error.response?.data?.errors ||
           error.response?.data?.message ||
           "Une erreur est survenue lors de l'inscription",
       };
@@ -92,13 +91,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     setLoading(true);
     try {
-      await axios.post(
-        "/api/accounts/logout/",
-        {},
-        {
-          withCredentials: true,
-        }
-      );
+      await userApi.logout();
       setUser(null);
       return { success: true };
     } catch (error) {

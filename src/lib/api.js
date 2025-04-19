@@ -27,9 +27,28 @@ api.interceptors.response.use(
         return Promise.reject(e);
       }
     }
+
+    // Authentication error handling - DELETED to avoid infinite loop
+    // Does not automatically redirect for 401 errors
+
     return Promise.reject(error);
   }
 );
+
+// Generic function for obtaining a CSRF token before a request
+export const getCsrfToken = async () => {
+  try {
+    const response = await axios.get("/api/csrf/", { withCredentials: true });
+    if (response.data && response.data.csrfToken) {
+      api.defaults.headers.common["X-CSRFToken"] = response.data.csrfToken;
+      return response.data.csrfToken;
+    }
+  } catch (error) {
+    console.warn("Avertissement: Impossible d'obtenir un token CSRF", error);
+    // Continue without blocking execution
+  }
+  return null;
+};
 
 // API for conversations
 export const conversationsApi = {
@@ -68,6 +87,31 @@ export const userApi = {
 
   // Get user preferences
   getPreferences: () => api.get("/api/accounts/settings/"),
+
+  // Login user
+  login: async (username, password) => {
+    try {
+      await getCsrfToken();
+    } catch (e) {}
+    return api.post("/api/accounts/api/login/", { username, password });
+  },
+
+  // Register new user
+  register: async (username, email, password1, password2) => {
+    await getCsrfToken(); // Get CSRF token first
+    return api.post("/api/accounts/api/register/", {
+      username,
+      email,
+      password1,
+      password2,
+    });
+  },
+
+  // Logout user
+  logout: async () => {
+    await getCsrfToken(); // Get CSRF token first
+    return api.post("/api/accounts/api/logout/");
+  },
 };
 
 export default api;
