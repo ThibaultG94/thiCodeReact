@@ -94,6 +94,11 @@ const Layout = () => {
         {/* Logo and title at top */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <Link to="/" className="flex items-center">
+            <img
+              src="/img/thicode-logo-final.png"
+              alt="ThiCodeAI Logo"
+              className="w-8 h-8 mr-2"
+            />
             <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600 dark:from-indigo-400 dark:to-purple-500">
               ThiCodeAI
             </span>
