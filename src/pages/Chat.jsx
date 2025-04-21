@@ -18,7 +18,7 @@ const Chat = () => {
     if (isAuthenticated) {
       fetchConversations();
     } else {
-      navigate("/login", { state: { from: location.pathname } });
+      navigate("/", { state: { from: location.pathname } });
     }
   }, [isAuthenticated, fetchConversations, navigate]);
 

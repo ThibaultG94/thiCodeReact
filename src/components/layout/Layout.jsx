@@ -86,7 +86,7 @@ const Layout = () => {
       )}
 
       {/* Unified sidebar - contains everything that was in the header and sidebar */}
-      <aside
+      <asideisAuthenticated
         className={`fixed md:relative z-40 h-screen w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
@@ -121,17 +121,19 @@ const Layout = () => {
               <span>Accueil</span>
             </Link>
 
-            <Link
-              to="/chat"
-              className={`flex items-center px-3 py-2 rounded-md text-sm ${
-                isActive("/chat")
-                  ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400"
-                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
-              }`}
-            >
-              <FiMessageSquare className="mr-3 flex-shrink-0" />
-              <span>Conversations</span>
-            </Link>
+            {isAuthenticated && (
+              <Link
+                to="/chat"
+                className={`flex items-center px-3 py-2 rounded-md text-sm ${
+                  isActive("/chat")
+                    ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
+                }`}
+              >
+                <FiMessageSquare className="mr-3 flex-shrink-0" />
+                <span>Conversations</span>
+              </Link>
+            )}
 
             <Link
               to="/examples"
@@ -259,7 +261,7 @@ const Layout = () => {
             </>
           )}
         </div>
-      </aside>
+      </asideisAuthenticated>
 
       {/* Main content */}
       <main className="flex-1 min-h-screen md:ml-0">
