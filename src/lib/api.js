@@ -13,23 +13,22 @@ const api = axios.create({
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    // If the error is due to an expired CSRF token
+    if (error.config && error.config._retry) {
+      return Promise.reject(error);
+    }
+
     if (
       error.response?.status === 403 &&
       error.response?.data?.detail?.includes("CSRF")
     ) {
       try {
-        // Get a new CSRF token
-        await axios.get("/api/csrf/");
-        // Retry the original query
+        error.config._retry = true;
+        await getCsrfToken();
         return api(error.config);
       } catch (e) {
         return Promise.reject(e);
       }
     }
-
-    // Authentication error handling - DELETED to avoid infinite loop
-    // Does not automatically redirect for 401 errors
 
     return Promise.reject(error);
   }
@@ -38,14 +37,22 @@ api.interceptors.response.use(
 // Generic function for obtaining a CSRF token before a request
 export const getCsrfToken = async () => {
   try {
-    const response = await axios.get("/api/csrf/", { withCredentials: true });
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/api/csrf/`,
+      {
+        withCredentials: true,
+      }
+    );
+
     if (response.data && response.data.csrfToken) {
       api.defaults.headers.common["X-CSRFToken"] = response.data.csrfToken;
+      console.log("CSRF Token obtenu avec succès:", response.data.csrfToken);
       return response.data.csrfToken;
+    } else {
+      console.error("Format de réponse CSRF inattendu:", response.data);
     }
   } catch (error) {
-    console.warn("Avertissement: Impossible d'obtenir un token CSRF", error);
-    // Continue without blocking execution
+    console.error("Erreur lors de l'obtention du token CSRF:", error);
   }
   return null;
 };
@@ -109,8 +116,30 @@ export const userApi = {
 
   // Logout user
   logout: async () => {
-    await getCsrfToken(); // Get CSRF token first
-    return api.post("/api/accounts/api/logout/");
+    try {
+      // Explicitly obtain CSRF token before disconnection
+      const csrfToken = await getCsrfToken();
+
+      // Checks whether the token has been obtained
+      if (!csrfToken) {
+        console.error("Impossible d'obtenir un token CSRF pour la déconnexion");
+      }
+
+      // Performs logout request
+      return api.post(
+        "/api/accounts/api/logout/",
+        {},
+        {
+          headers: {
+            "X-CSRFToken":
+              csrfToken || api.defaults.headers.common["X-CSRFToken"],
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Erreur lors de la préparation de la déconnexion:", error);
+      throw error;
+    }
   },
 };
 

@@ -49,8 +49,17 @@ const Layout = () => {
   }, []);
 
   const handleLogout = async () => {
-    await logout();
-    navigate("/");
+    if (window.confirm("Êtes-vous sûr de vouloir vous déconnecter ?")) {
+      try {
+        await logout();
+        navigate("/");
+      } catch (error) {
+        console.error("Erreur de déconnexion:", error);
+        alert(
+          "Une erreur est survenue lors de la déconnexion. Veuillez réessayer."
+        );
+      }
+    }
   };
 
   const toggleSidebar = () => {
@@ -200,7 +209,7 @@ const Layout = () => {
 
               <button
                 onClick={handleLogout}
-                className="flex items-center w-full px-3 py-2 mt-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                className="flex items-center w-full px-3 py-2 mt-2 cursor-pointer text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
               >
                 <FiLogOut className="mr-3 flex-shrink-0" />
                 <span>Déconnexion</span>
