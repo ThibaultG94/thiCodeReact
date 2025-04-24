@@ -221,7 +221,7 @@ const Register = () => {
           <div>
             <Button
               type="submit"
-              className="w-full"
+              className="w-full bg-indigo-600 text-white hover:bg-indigo-700"
               isLoading={isLoading}
               leftIcon={<FiUserPlus />}
             >
@@ -232,19 +232,19 @@ const Register = () => {
           <div className="text-sm text-center">
             <p className="text-gray-600 dark:text-gray-400">
               En vous inscrivant, vous acceptez nos{" "}
-              <a
-                href="#"
-                className="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+              <Link
+                to="/conditions"
+                className="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 cursor-pointer underline"
               >
                 conditions d'utilisation
-              </a>{" "}
+              </Link>{" "}
               et notre{" "}
-              <a
-                href="#"
-                className="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+              <Link
+                to="/confidentialite"
+                className="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 cursor-pointer underline"
               >
                 politique de confidentialité
-              </a>
+              </Link>
             </p>
           </div>
         </form>
