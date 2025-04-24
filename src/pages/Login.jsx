@@ -134,12 +134,12 @@ const Login = () => {
             </div>
 
             <div className="text-sm">
-              <a
-                href="#"
-                className="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+              <Link
+                to="/forgot-password"
+                className="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 cursor-pointer"
               >
                 Mot de passe oublié ?
-              </a>
+              </Link>
             </div>
           </div>
 

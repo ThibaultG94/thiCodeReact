@@ -12,6 +12,8 @@ import NotFound from "./pages/NotFound";
 import Documentation from "./pages/Documentation";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   return (
@@ -24,6 +26,8 @@ function App() {
               <Route index element={<Home />} />
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Register />} />
+              <Route path="forgot-password" element={<ForgotPassword />} />
+              <Route path="reset-password/:token" element={<ResetPassword />} />
 
               {/* Documentation and legal pages */}
               <Route path="documentation" element={<Documentation />} />
