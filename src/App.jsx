@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import Documentation from "./pages/Documentation";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 
@@ -23,6 +24,9 @@ function App() {
               <Route index element={<Home />} />
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Register />} />
+
+              {/* Documentation and legal pages */}
+              <Route path="documentation" element={<Documentation />} />
               <Route path="conditions" element={<TermsOfService />} />
               <Route path="confidentialite" element={<PrivacyPolicy />} />
 
