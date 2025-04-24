@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { Link } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
 import { useConversationStore } from "../lib/store";
 import Button from "../components/ui/Button";
@@ -143,6 +142,7 @@ const Home = () => {
                   onClick={() => navigate("/login")}
                   size="lg"
                   leftIcon={<FiLogIn />}
+                  className="bg-indigo-600 text-white hover:bg-indigo-700"
                 >
                   Connexion
                 </Button>

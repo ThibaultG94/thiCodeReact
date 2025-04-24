@@ -14,6 +14,7 @@ import {
   FiSun,
   FiMenu,
   FiX,
+  FiBook,
 } from "react-icons/fi";
 
 const Layout = () => {
@@ -136,15 +137,15 @@ const Layout = () => {
             )}
 
             <Link
-              to="/examples"
-              className={`flex items-center px-3 py-2 rounded-md text-sm ${
-                isActive("/examples")
+              to="/documentation"
+              className={`flex items-center px-3 py-2 rounded-md text-sm cursor-pointer ${
+                isActive("/documentation")
                   ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400"
                   : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
               }`}
             >
-              <FiCode className="mr-3 flex-shrink-0" />
-              <span>Exemples de code</span>
+              <FiBook className="mr-3 flex-shrink-0" />
+              <span>Documentation</span>
             </Link>
           </nav>
 
@@ -184,7 +185,7 @@ const Layout = () => {
           {/* Dark/Light theme */}
           <button
             onClick={toggleDarkMode}
-            className="flex items-center w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md mb-2"
+            className="flex items-center w-full px-3 py-2 text-sm cursor-pointer text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md mb-2"
           >
             {darkMode ? (
               <>
