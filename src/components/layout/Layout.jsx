@@ -87,7 +87,7 @@ const Layout = () => {
       )}
 
       {/* Unified sidebar - contains everything that was in the header and sidebar */}
-      <asideisAuthenticated
+      <aside
         className={`fixed md:relative z-40 h-screen w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
@@ -262,7 +262,7 @@ const Layout = () => {
             </>
           )}
         </div>
-      </asideisAuthenticated>
+      </aside>
 
       {/* Main content */}
       <main className="flex-1 min-h-screen md:ml-0">

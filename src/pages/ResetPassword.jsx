@@ -20,7 +20,7 @@ const ResetPassword = () => {
     const verifyToken = async () => {
       try {
         const response = await fetch(
-          `/api/accounts/verify-reset-token/${token}/`
+          `http://localhost:8000/api/accounts/api/verify-reset-token/${token}/`
         );
         const data = await response.json();
 
@@ -82,6 +82,7 @@ const ResetPassword = () => {
         );
       }
     } catch (error) {
+      console.error("Reset password error:", error);
       setError(
         "Impossible de communiquer avec le serveur. Veuillez réessayer plus tard."
       );

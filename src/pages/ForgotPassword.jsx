@@ -18,13 +18,16 @@ const ForgotPassword = () => {
 
     try {
       // Call the API to request a reset email
-      const response = await fetch("/api/accounts/reset-password/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
+      const response = await fetch(
+        "http://localhost:8000/api/accounts/api/reset-password/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        }
+      );
 
       if (response.ok) {
         setSuccess(true);
@@ -35,6 +38,7 @@ const ForgotPassword = () => {
         );
       }
     } catch (error) {
+      console.error("Error sending reset password email:", error);
       setError(
         "Impossible de communiquer avec le serveur. Veuillez réessayer plus tard."
       );
