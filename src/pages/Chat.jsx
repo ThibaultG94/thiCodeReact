@@ -17,6 +17,7 @@ const Chat = () => {
   useEffect(() => {
     if (isAuthenticated) {
       fetchConversations();
+      console.log("conversations:", conversations);
     } else {
       navigate("/", { state: { from: location.pathname } });
     }
@@ -73,7 +74,12 @@ const Chat = () => {
         </div>
 
         <div className="p-2">
-          {conversations.length > 0 ? (
+          {console.log(
+            "conversations type:",
+            typeof conversations,
+            conversations
+          )}
+          {Array.isArray(conversations) && conversations.length > 0 ? (
             <div className="space-y-1">
               {conversations.map((conversation) => (
                 <button

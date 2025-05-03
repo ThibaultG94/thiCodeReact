@@ -14,8 +14,16 @@ export const useConversationStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const response = await conversationsApi.getAll();
-      set({ conversations: response.data, loading: false });
+      console.log("API response:", response);
+
+      // Ensure we're dealing with an array
+      const conversationsArray = Array.isArray(response.data)
+        ? response.data
+        : response.data?.results || [];
+
+      set({ conversations: conversationsArray, loading: false });
     } catch (err) {
+      console.error("Error fetching conversations:", err);
       set({ error: err.message, loading: false });
     }
   },
@@ -33,7 +41,11 @@ export const useConversationStore = create((set, get) => ({
   createConversation: async (message, model = "mistral") => {
     set({ loading: true, error: null });
     try {
+      console.log("Sending message to API:", message, "with model:", model);
+
       const response = await conversationsApi.create(message, model);
+
+      console.log("API response:", response.data);
 
       // Update conversation list
       set((state) => ({
@@ -44,6 +56,7 @@ export const useConversationStore = create((set, get) => ({
 
       return response.data.id;
     } catch (err) {
+      console.error("Error creating conversation:", err);
       set({ error: err.message, loading: false });
       return null;
     }

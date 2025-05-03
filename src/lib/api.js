@@ -60,27 +60,54 @@ export const getCsrfToken = async () => {
 // API for conversations
 export const conversationsApi = {
   // Get the list of conversations
-  getAll: () => api.get("/api/chat/conversations/"),
+  getAll: async () => {
+    await getCsrfToken();
+    return api.get("/chat/api/conversations/");
+  },
 
   // Get details of a conversation
-  getById: (id) => api.get(`/api/chat/conversations/${id}/`),
+  getById: async (id) => {
+    await getCsrfToken();
+    return api.get(`/chat/api/conversations/${id}/`);
+  },
 
   // Create a new conversation
-  create: (message, model = "mistral") =>
-    api.post("/api/chat/conversations/", { message, ai_model: model }),
+  create: async (message, model = "mistral") => {
+    await getCsrfToken();
+
+    console.log(
+      "API call: create conversation with message:",
+      message,
+      "model:",
+      model
+    );
+
+    return api.post("/chat/api/conversations/create/", {
+      message,
+      ai_model: model,
+    });
+  },
 
   // Delete a conversation
-  delete: (id) => api.delete(`/api/chat/conversations/${id}/`),
+  delete: async (id) => {
+    await getCsrfToken();
+    return api.delete(`/chat/api/conversations/${id}/delete/`);
+  },
 
   // Rename a conversation
-  rename: (id, title) => api.patch(`/api/chat/conversations/${id}/`, { title }),
+  rename: async (id, title) => {
+    await getCsrfToken();
+    return api.patch(`/chat/api/conversations/${id}/`, { title });
+  },
 
   // Sending a message in a conversation
-  sendMessage: (id, message, model = "mistral") =>
-    api.post(`/api/chat/conversations/${id}/messages/`, {
+  sendMessage: async (id, message, model = "mistral") => {
+    await getCsrfToken();
+    return api.post(`/chat/api/conversations/${id}/messages/`, {
       message,
       model,
-    }),
+    });
+  },
 };
 
 // API for users
