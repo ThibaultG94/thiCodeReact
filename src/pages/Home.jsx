@@ -38,8 +38,8 @@ const Home = () => {
   if (isAuthenticated) {
     // Version for online users
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8">
-        <div className="w-full max-w-xl text-center">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 md:px-8 h-full">
+        <div className="w-full max-w-xl text-center my-auto">
           <h1 className="text-3xl md:text-4xl font-medium text-gray-800 dark:text-gray-100 mb-2">
             Bienvenue sur ThiCodeAI
             {user?.username ? `, ${user.username}` : ""}
