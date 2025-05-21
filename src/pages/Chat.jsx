@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
-import { useConversationStore } from "../lib/store";
 import { useAuth } from "../contexts/AuthContext";
+import useChatStore from "../store/chatStore";
 import Conversation from "../components/chat/Conversation";
+import ConversationList from "../components/chat/ConversationList";
+import ErrorMessage from "../components/ui/ErrorMessage";
 import Button from "../components/ui/Button";
-import { FiMessageSquare, FiPlus, FiMenu } from "react-icons/fi";
+import { FiMenu, FiPlus } from "react-icons/fi";
 
 const Chat = () => {
   const { conversationId } = useParams();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
-  const { conversations, fetchConversations } = useConversationStore();
+  const { isAuthenticated } = useAuth();
+  const { fetchConversations, conversations } = useChatStore();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Load user's conversations on mount
@@ -24,9 +26,16 @@ const Chat = () => {
   }, [isAuthenticated, fetchConversations, navigate]);
 
   // Create a new conversation
-  const handleNewConversation = () => {
-    navigate("/chat/new");
-    setMobileSidebarOpen(false);
+  const handleNewConversation = async () => {
+    try {
+      const newConversation = await useChatStore.getState().createConversation(
+        'Bonjour, je suis ThiCodeAI. Comment puis-je vous aider ?'
+      );
+      navigate(`/chat/${newConversation.id}`);
+      setMobileSidebarOpen(false);
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+    }
   };
 
   // Toggle mobile sidebar
@@ -58,59 +67,11 @@ const Chat = () => {
           mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } fixed md:hidden top-0 left-0 w-64 h-full bg-white dark:bg-gray-800 z-40 border-r border-gray-200 dark:border-gray-700 transition-transform duration-300 ease-in-out overflow-y-auto`}
       >
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-            Conversations
-          </h2>
-          <Button
-            onClick={handleNewConversation}
-            variant="ghost"
-            size="sm"
-            className="p-1"
-            aria-label="Nouvelle conversation"
-          >
-            <FiPlus />
-          </Button>
-        </div>
-
-        <div className="p-2">
-          {console.log(
-            "conversations type:",
-            typeof conversations,
-            conversations
-          )}
-          {Array.isArray(conversations) && conversations.length > 0 ? (
-            <div className="space-y-1">
-              {conversations.map((conversation) => (
-                <button
-                  key={conversation.id}
-                  onClick={() => {
-                    navigate(`/chat/${conversation.id}`);
-                    setMobileSidebarOpen(false);
-                  }}
-                  className={`w-full text-left px-3 py-2 rounded-md text-sm flex items-center ${
-                    conversation.id.toString() === conversationId
-                      ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400"
-                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                  }`}
-                >
-                  <FiMessageSquare className="mr-2 flex-shrink-0" />
-                  <span className="truncate">
-                    {conversation.title || "Nouvelle conversation"}
-                  </span>
-                </button>
-              ))}
-            </div>
-          ) : (
-            <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-              Aucune conversation
-            </div>
-          )}
-        </div>
+        <ConversationList onSelect={() => setMobileSidebarOpen(false)} />
       </aside>
 
       {/* Main chat content */}
-      <div className="flex-1">
+      <div className="flex-1 relative">
         {conversationId ? (
           <Conversation conversationId={conversationId} />
         ) : (
@@ -133,6 +94,9 @@ const Chat = () => {
             </div>
           </div>
         )}
+        
+        {/* Error message */}
+        <ErrorMessage />
       </div>
     </div>
   );

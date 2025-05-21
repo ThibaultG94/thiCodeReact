@@ -1,4 +1,5 @@
 import axios from "axios";
+import { endpoints } from '../config/endpoints';
 
 // Create an axios instance with a basic configuration
 const api = axios.create({
@@ -38,7 +39,7 @@ api.interceptors.response.use(
 export const getCsrfToken = async () => {
   try {
     const response = await axios.get(
-      `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/api/csrf/`,
+      `${import.meta.env.VITE_API_URL || "http://localhost:8000"}${endpoints.csrf()}`,
       {
         withCredentials: true,
       }
@@ -62,49 +63,57 @@ export const conversationsApi = {
   // Get the list of conversations
   getAll: async () => {
     await getCsrfToken();
-    return api.get("/chat/api/conversations/");
+    return api.get(endpoints.conversations.list());
   },
 
   // Get details of a conversation
   getById: async (id) => {
     await getCsrfToken();
-    return api.get(`/chat/api/conversations/${id}/`);
+    return api.get(endpoints.conversations.get(id));
+  },
+
+  // Ask Mistral AI for a response
+  askMistral: async (message) => {
+    await getCsrfToken();
+    
+    console.log("API call: asking Mistral", { message });
+    
+    const response = await api.post(endpoints.mistral.ask(), {
+      message,
+    });
+    
+    return response.data.response;
   },
 
   // Create a new conversation
-  create: async (message, model = "mistral") => {
+  create: async (message) => {
     await getCsrfToken();
 
-    console.log(
-      "API call: create conversation with message:",
-      message,
-      "model:",
-      model
-    );
+    console.log("API call: create conversation with message:", message);
 
-    return api.post("/chat/api/conversations/create/", {
-      message,
-      ai_model: model,
+    return api.post(endpoints.conversations.create(), {
+      title: message.slice(0, 50) + '...',
+      initial_message: message
     });
   },
 
   // Delete a conversation
   delete: async (id) => {
     await getCsrfToken();
-    return api.delete(`/chat/api/conversations/${id}/delete/`);
+    return api.delete(endpoints.conversations.get(id));
   },
 
   // Rename a conversation
   rename: async (id, title) => {
     await getCsrfToken();
-    return api.patch(`/chat/api/conversations/${id}/`, { title });
+    return api.patch(endpoints.conversations.get(id), { title });
   },
 
   // Sending a message in a conversation
   sendMessage: async (id, message, model = "mistral") => {
     await getCsrfToken();
-    return api.post(`/chat/api/conversations/${id}/messages/`, {
-      message,
+    return api.post(endpoints.conversations.messages(id), {
+      content: message,
       model,
     });
   },
@@ -113,27 +122,27 @@ export const conversationsApi = {
 // API for users
 export const userApi = {
   // Get current user information
-  getCurrentUser: () => api.get("/api/accounts/current-user/"),
+  getCurrentUser: () => api.get(endpoints.accounts.currentUser()),
 
   // Update user preferences
   updatePreferences: (preferences) =>
-    api.patch("/api/accounts/settings/", { preferences }),
+    api.patch(endpoints.accounts.settings(), { preferences }),
 
   // Get user preferences
-  getPreferences: () => api.get("/api/accounts/settings/"),
+  getPreferences: () => api.get(endpoints.accounts.settings()),
 
   // Login user
   login: async (username, password) => {
     try {
       await getCsrfToken();
     } catch (e) {}
-    return api.post("/api/accounts/api/login/", { username, password });
+    return api.post(endpoints.accounts.login(), { username, password });
   },
 
   // Register new user
   register: async (username, email, password1, password2) => {
     await getCsrfToken(); // Get CSRF token first
-    return api.post("/api/accounts/api/register/", {
+    return api.post(endpoints.accounts.register(), {
       username,
       email,
       password1,
@@ -154,7 +163,7 @@ export const userApi = {
 
       // Performs logout request
       return api.post(
-        "/api/accounts/api/logout/",
+        endpoints.accounts.logout(),
         {},
         {
           headers: {
@@ -170,4 +179,5 @@ export const userApi = {
   },
 };
 
+export { endpoints };
 export default api;

@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { useConversationStore } from "../../lib/store";
 import { useAuth } from "../../contexts/AuthContext";
+import useChatStore from "../../store/chatStore";
 import ChatMessage from "./ChatMessage";
 import TypingIndicator from "./TypingIndicator";
 import Button from "../ui/Button";
-import { FiSend, FiTrash2, FiEdit2, FiMoreVertical } from "react-icons/fi";
+import ErrorMessage from "../ui/ErrorMessage";
+import { FiSend, FiTrash2, FiEdit2, FiMoreVertical, FiArchive, FiRefreshCw } from "react-icons/fi";
 
 const Conversation = ({ conversationId }) => {
   const [messageInput, setMessageInput] = useState("");
@@ -18,25 +19,34 @@ const Conversation = ({ conversationId }) => {
 
   const { user } = useAuth();
   const {
-    currentConversation,
-    fetchConversation,
-    sendMessageWithAnimation,
+    conversations,
+    messages,
+    isLoading,
     isTyping,
-    renameConversation,
-    deleteConversation,
-  } = useConversationStore();
+    error,
+    sendMessage,
+    archiveConversation,
+    restoreConversation,
+    updateMetadata
+  } = useChatStore();
+  
+  const currentConversation = conversations.find(c => c.id === parseInt(conversationId));
 
-  // Load conversation on mount or when ID changes
+  // Load conversation messages on mount or when ID changes
   useEffect(() => {
     if (conversationId) {
-      fetchConversation(conversationId);
+      const conversation = conversations.find(c => c.id === parseInt(conversationId));
+      if (conversation) {
+        // Charger les messages de la conversation
+        useChatStore.getState().fetchMessages(conversationId);
+      }
     }
-  }, [conversationId, fetchConversation]);
+  }, [conversationId, conversations]);
 
   // Scroll to bottom of messages when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [currentConversation?.messages, isTyping]);
+  }, [messages, isTyping]);
 
   // Focus input when conversation loads
   useEffect(() => {
@@ -56,31 +66,42 @@ const Conversation = ({ conversationId }) => {
 
     if (!messageInput.trim() || !conversationId) return;
 
-    // Send message and clear input
-    await sendMessageWithAnimation(conversationId, messageInput, aiModel);
-    setMessageInput("");
+    try {
+      // Send message and clear input
+      await sendMessage(conversationId, messageInput, aiModel);
+      setMessageInput("");
+    } catch (error) {
+      // Error is handled by the store and displayed by ErrorMessage
+      console.error('Error sending message:', error);
+    }
   };
 
   // Handle rename conversation
   const handleRename = async () => {
     if (isRenaming && newTitle.trim()) {
-      await renameConversation(conversationId, newTitle);
-      setIsRenaming(false);
-      setMenuOpen(false);
+      try {
+        await updateMetadata(conversationId, { title: newTitle });
+        setIsRenaming(false);
+        setMenuOpen(false);
+      } catch (error) {
+        console.error('Error renaming conversation:', error);
+      }
     } else {
       setNewTitle(currentConversation?.title || "");
       setIsRenaming(true);
     }
   };
 
-  // Handle delete conversation
-  const handleDelete = async () => {
-    if (
-      window.confirm("Êtes-vous sûr de vouloir supprimer cette conversation ?")
-    ) {
-      await deleteConversation(conversationId);
-      // Navigate to home or conversations list
-      window.location.href = "/";
+  // Handle archive/restore conversation
+  const handleArchiveRestore = async () => {
+    try {
+      if (currentConversation?.status === 'archived') {
+        await restoreConversation(conversationId);
+      } else {
+        await archiveConversation(conversationId);
+      }
+    } catch (error) {
+      console.error('Error archiving/restoring conversation:', error);
     }
   };
 
@@ -92,11 +113,19 @@ const Conversation = ({ conversationId }) => {
     }
   };
 
-  // If no conversation is loaded yet
-  if (!currentConversation) {
+  // Show loading or error state
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="animate-pulse">Chargement de la conversation...</div>
+      </div>
+    );
+  }
+
+  if (!currentConversation) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-red-500">Conversation non trouvée</div>
       </div>
     );
   }
@@ -154,11 +183,20 @@ const Conversation = ({ conversationId }) => {
                   Renommer
                 </button>
                 <button
-                  onClick={handleDelete}
-                  className="flex items-center w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={handleArchiveRestore}
+                  className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
-                  <FiTrash2 size={16} className="mr-2" />
-                  Supprimer
+                  {currentConversation?.status === 'archived' ? (
+                    <>
+                      <FiRefreshCw size={16} className="mr-2" />
+                      Restaurer
+                    </>
+                  ) : (
+                    <>
+                      <FiArchive size={16} className="mr-2" />
+                      Archiver
+                    </>
+                  )}
                 </button>
               </div>
             )}
@@ -168,14 +206,14 @@ const Conversation = ({ conversationId }) => {
 
       {/* Messages list */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {currentConversation.messages?.length === 0 ? (
+        {messages.length === 0 ? (
           <div className="flex h-full items-center justify-center">
             <p className="text-gray-500 dark:text-gray-400 text-center">
               Commencez la conversation en envoyant un message ci-dessous.
             </p>
           </div>
         ) : (
-          currentConversation.messages?.map((message) => (
+          messages.map((message) => (
             <ChatMessage key={message.id} message={message} />
           ))
         )}

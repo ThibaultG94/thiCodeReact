@@ -1,8 +1,20 @@
-# thiCodeAI React Frontend Documentation
+# thiCodeAI React Frontend Project Guide
 
-## Project Overview
+## Overview
 
-thiCodeAI's frontend is a modern React application built with Vite, utilizing React Router for navigation, TailwindCSS for styling, and various other modern web technologies. The application provides a responsive and intuitive interface for interacting with the AI chat system.
+The frontend is built with React and uses Zustand for state management. It provides a modern chat interface with real-time updates and loading states.
+
+### Key Features
+- User authentication flow
+- Real-time chat interface
+- Conversation management
+- Typing indicators for AI responses
+- Dark mode support
+
+### Important Notes
+- The project uses `react-router` instead of `react-router-dom`
+- All code (comments, variables, etc.) should be in English
+- The UI supports both light and dark themes
 
 ## Project Structure
 
@@ -84,6 +96,48 @@ The application includes a theme system (`ThemeContext`) that provides:
 - Dynamic styling
 
 ## State Management
+
+### Chat Store (chatStore.js)
+
+Manages all chat-related state using Zustand:
+
+```javascript
+const useChatStore = create((set, get) => ({
+  // State
+  conversations: [],
+  messages: [],
+  isLoading: false,
+  isTyping: false,
+  error: null,
+
+  // Actions
+  sendMessage: async (conversationId, message) => {
+    set({ isTyping: true })
+    // Send message and handle response...
+  },
+
+  checkMessageStatus: async (conversationId, messageId) => {
+    // Poll for message status...
+  }
+}))
+```
+
+### Message Flow
+
+1. User sends a message:
+   - Message is immediately displayed
+   - Typing indicator appears
+   - Backend is called asynchronously
+
+2. Backend processing:
+   - Frontend polls status endpoint
+   - Typing indicator remains until response
+   - AI response is displayed when ready
+
+3. Error handling:
+   - Network errors show error message
+   - Retry mechanism for failed requests
+   - Clear error state on new actions
 
 The application uses a combination of state management solutions:
 - **Zustand**: For global application state
